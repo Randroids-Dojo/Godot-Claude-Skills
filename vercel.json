@@ -1,9 +1,5 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "name": "godot-claude-skills",
-  "buildCommand": null,
-  "outputDirectory": "example-project/build",
   "headers": [
     {
       "source": "/(.*)",
@@ -12,8 +8,5 @@
         { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
