@@ -1,0 +1,18 @@
+# Git
+.git
+
+# Development
+.claude
+.github
+skills
+
+# Build artifacts (except what we deploy)
+example-project/.godot
+example-project/addons
+example-project/reports
+example-project/*.log
+
+# Documentation (not needed for game deployment)
+*.md
+LICENSE
+CHANGELOG.md

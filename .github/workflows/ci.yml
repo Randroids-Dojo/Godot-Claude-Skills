@@ -267,6 +267,18 @@ jobs:
           path: example-project/build/
 
       # Deploy to Vercel (only if VERCEL_TOKEN is configured)
+      # To enable Vercel deployment:
+      # 1. Create a Vercel account at https://vercel.com
+      # 2. Install Vercel CLI: npm i -g vercel
+      # 3. Run `vercel link` in example-project/build to create project
+      # 4. Get VERCEL_ORG_ID and VERCEL_PROJECT_ID from .vercel/project.json
+      # 5. Create a token at https://vercel.com/account/tokens
+      # 6. Add secrets in GitHub: Settings → Secrets → Actions:
+      #    - VERCEL_TOKEN: Your Vercel API token
+      #    - VERCEL_ORG_ID: Your organization/team ID
+      #    - VERCEL_PROJECT_ID: Your project ID
+      # 7. Add variable in GitHub: Settings → Variables → Actions:
+      #    - ENABLE_VERCEL_DEPLOY: true
       - name: Deploy to Vercel
         if: ${{ vars.ENABLE_VERCEL_DEPLOY == 'true' }}
         run: |
@@ -300,6 +312,8 @@ jobs:
           echo ""
           echo "========================================="
 
+  # PR Preview Deployments - creates a unique URL for each pull request
+  # Requires the same Vercel secrets as the main deployment above
   preview-deploy:
     name: Deploy PR Preview
     runs-on: ubuntu-latest
