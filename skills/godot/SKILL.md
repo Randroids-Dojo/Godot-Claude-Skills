@@ -1,11 +1,11 @@
 ---
-name: godot-testing
-description: Test, build, and deploy Godot projects. Use for writing GdUnit4 tests, running test suites, simulating input, exporting web builds, deploying to Vercel/GitHub Pages, or setting up CI pipelines.
+name: godot
+description: Develop, test, build, and deploy Godot 4.x games. Includes GdUnit4 testing with input simulation, web/desktop exports, CI/CD pipelines, and deployment to Vercel/GitHub Pages/itch.io.
 ---
 
-# Godot Testing Skill
+# Godot Skill
 
-Test, build, and deploy Godot 4.x projects. Includes GdUnit4 testing, web exports, and deployment to various platforms.
+Develop, test, build, and deploy Godot 4.x games. This skill provides comprehensive support for Godot game development workflows.
 
 ## Quick Reference
 
@@ -200,7 +200,7 @@ Run tests in GitHub Actions:
 Use bundled helper script for simpler CI:
 
 ```bash
-python skills/godot-testing/scripts/run_tests.py --project ./example-project
+python skills/godot/scripts/run_tests.py --project ./example-project
 ```
 
 ## Setup GdUnit4

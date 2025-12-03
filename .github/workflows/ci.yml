@@ -171,7 +171,7 @@ jobs:
         run: |
           echo "=== Test Results ==="
           if [ -d "example-project/reports" ]; then
-            python skills/godot-testing/scripts/parse_results.py \
+            python skills/godot/scripts/parse_results.py \
               example-project/reports \
               --format summary || echo "No test results to parse"
           else

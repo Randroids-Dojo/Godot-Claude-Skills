@@ -1,6 +1,6 @@
 # Godot-Claude-Skills
 
-A collection of Claude Code skills for Godot Engine game development and testing.
+A collection of Claude Code skills for Godot Engine game development.
 
 ## What are Skills?
 
@@ -19,14 +19,10 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 ├── example-project/           # Tic-Tac-Toe game for testing
 │   ├── project.godot
 │   ├── test/                  # GdUnit4 test files
-│   │   ├── game_test.gd
-│   │   └── game_scene_test.gd
 │   ├── scenes/
-│   │   └── main.tscn
 │   └── scripts/
-│       └── game.gd
 ├── skills/
-│   ├── godot-testing/         # Main testing skill
+│   ├── godot/                 # Main Godot development skill
 │   │   ├── SKILL.md
 │   │   ├── scripts/           # Python helper scripts
 │   │   └── references/        # Documentation
@@ -39,16 +35,18 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 
 | Skill | Description |
 |-------|-------------|
-| `godot-testing` | Test Godot projects using GdUnit4 framework with input simulation, scene testing, and CI integration |
+| `godot` | Develop, test, build, and deploy Godot 4.x games with GdUnit4, web exports, and CI/CD |
 | `example-test` | Simple example skill for testing and learning the skill format |
 
-## godot-testing Skill
+## Godot Skill
 
-The main skill for testing Godot projects. Includes:
+The main skill for Godot game development. Includes:
 
 - **GdUnit4 integration** - Unit tests, scene tests, input simulation
-- **Python helper scripts** - `run_tests.py`, `parse_results.py`, `validate_project.py`
-- **Reference documentation** - Quickstart, scene runner API, assertions, CI setup
+- **Web/Desktop exports** - Build and export games
+- **CI/CD pipelines** - GitHub Actions workflows
+- **Deployment** - Vercel, GitHub Pages, itch.io
+- **Python helper scripts** - `run_tests.py`, `parse_results.py`, `export_build.py`
 
 ### Quick Example
 
@@ -71,7 +69,17 @@ func test_player_health() -> void:
 godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 
 # Using helper script
-python skills/godot-testing/scripts/run_tests.py --project ./my-game
+python skills/godot/scripts/run_tests.py --project ./my-game
+```
+
+### Building & Deploying
+
+```bash
+# Export web build
+godot --headless --export-release "Web" ./build/index.html
+
+# Deploy to Vercel
+vercel deploy ./build --prod
 ```
 
 ## Example Project
@@ -82,6 +90,7 @@ The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full te
 - **Win detection** for rows, columns, and diagonals
 - **Draw detection** when board is full
 - **GdUnit4 tests** - 15+ unit and integration tests
+- **Web export** - Deployable to Vercel
 
 ### Running Locally
 
@@ -97,73 +106,40 @@ cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 ```
 
-### Automation API
+## Installing the Skill
 
-The game exposes methods for automated testing:
+### For Local Development
 
-```gdscript
-game.make_move(4)           # Place at cell index (0-8)
-game.get_board_state()      # Get current board as array
-game.is_game_active()       # Check if game is running
-game.get_current_player()   # Get "X" or "O"
+```bash
+# Clone this repo
+git clone https://github.com/your-org/Godot-Claude-Skills.git
+
+# Copy the godot skill to your project
+cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
+
+# Or copy to project-level
+cp -r Godot-Claude-Skills/skills/godot your-project/.claude/skills/
 ```
 
-## Creating New Skills
+### From Marketplace (Coming Soon)
 
-1. Create a new folder under `/skills/` with your skill name (lowercase, use hyphens)
-2. Add a `SKILL.md` file with the following format:
-
-```yaml
----
-name: your-skill-name
-description: Brief description of what the skill does and when to use it.
----
-
-# Your Skill Title
-
-Your instructions and guidelines here...
-```
-
-3. Optionally add:
-   - `scripts/` - Helper scripts (Python, GDScript)
-   - `references/` - Additional documentation
-   - `assets/` - Templates, boilerplate files
+The `godot` skill will be available in the Claude Code skill marketplace.
 
 ## CI/CD
 
 This repository includes GitHub Actions CI that:
 
 1. **Installs Claude CLI** - Sets up `@anthropic-ai/claude-code` via npm
-2. **Installs Godot Engine** - Sets up Godot 4.3.0 for headless use
+2. **Installs Godot Engine** - Sets up Godot 4.3.0 with export templates
 3. **Installs GdUnit4** - Clones testing framework into example project
-4. **Installs Skills** - Copies skills to `.claude/skills/` directory
-5. **Validates Skills** - Checks that all skills have proper YAML frontmatter
-6. **Imports Godot Project** - Generates `.godot` cache
-7. **Runs Smoke Test** - Validates game initialization
-8. **Runs GdUnit4 Tests** - Executes all unit and integration tests
-9. **Uploads Reports** - Saves JUnit XML test results as artifacts
+4. **Runs Tests** - Executes all GdUnit4 unit and integration tests
+5. **Builds Web Export** - Creates deployable web build
+6. **Deploys to Vercel** - Automatic deployment on merge to main (optional)
 
 The CI runs on:
 - Push to `main`/`master` branches
 - Pull requests to `main`/`master` branches
 - Manual trigger via `workflow_dispatch`
-
-### Local Development
-
-```bash
-# Install Claude CLI
-npm install -g @anthropic-ai/claude-code
-
-# Copy skills to .claude directory
-cp -r skills/* .claude/skills/
-
-# Install GdUnit4 in your project
-cd your-project
-git clone https://github.com/MikeSchulze/gdUnit4.git addons/gdUnit4
-
-# Run tests
-python skills/godot-testing/scripts/run_tests.py --project ./your-project
-```
 
 ## Future: PlayGodot
 

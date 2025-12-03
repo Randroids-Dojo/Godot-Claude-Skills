@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          python skills/godot-testing/scripts/run_tests.py \
+          python skills/godot/scripts/run_tests.py \
             --project . \
             --report ./reports \
             --verbose
@@ -79,7 +79,7 @@ jobs:
       - name: Parse Results
         if: always()
         run: |
-          python skills/godot-testing/scripts/parse_results.py \
+          python skills/godot/scripts/parse_results.py \
             ./reports \
             --format markdown >> $GITHUB_STEP_SUMMARY
 ```
