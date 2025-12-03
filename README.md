@@ -10,6 +10,9 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 
 ```
 .
+├── .claude-plugin/
+│   ├── plugin.json            # Plugin metadata for marketplace
+│   └── marketplace.json       # Marketplace registry info
 ├── .claude/
 │   ├── settings.json          # Claude Code project settings
 │   └── skills/                # Skills installed for local use
@@ -28,6 +31,8 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 │   │   └── references/        # Documentation
 │   └── example-test/          # Simple example skill
 │       └── SKILL.md
+├── LICENSE                    # MIT License
+├── CHANGELOG.md               # Version history
 └── README.md
 ```
 
@@ -106,24 +111,50 @@ cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 ```
 
-## Installing the Skill
+## Installing the Skills
 
-### For Local Development
+### Option 1: Plugin Marketplace (Recommended)
+
+Install via Claude Code's plugin system:
+
+```bash
+# Add the marketplace
+/plugin marketplace add Randroids-Dojo/Godot-Claude-Skills
+
+# Install the plugin
+/plugin install godot-skills
+```
+
+The skills will be automatically available in all your Claude Code sessions.
+
+### Option 2: Personal Installation
+
+Install skills for all your projects:
 
 ```bash
 # Clone this repo
-git clone https://github.com/your-org/Godot-Claude-Skills.git
+git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
 
-# Copy the godot skill to your project
+# Copy to personal skills directory
 cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
+```
 
-# Or copy to project-level
+### Option 3: Project-Level Installation
+
+Install skills for a specific project (shared with team via git):
+
+```bash
+# Clone this repo
+git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
+
+# Copy to project skills directory
+mkdir -p your-project/.claude/skills
 cp -r Godot-Claude-Skills/skills/godot your-project/.claude/skills/
 ```
 
-### From Marketplace (Coming Soon)
+### Verifying Installation
 
-The `godot` skill will be available in the Claude Code skill marketplace.
+After installation, Claude will automatically discover the skill when you work on Godot projects. You can verify by asking Claude about GdUnit4 testing or Godot exports.
 
 ## CI/CD
 

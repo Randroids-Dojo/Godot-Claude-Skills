@@ -1,0 +1,21 @@
+{
+  "name": "godot-skills",
+  "version": "1.0.0",
+  "description": "Develop, test, build, and deploy Godot 4.x games with Claude Code. Includes GdUnit4 testing, web/desktop exports, CI/CD pipelines, and deployment to Vercel/GitHub Pages/itch.io.",
+  "author": "Randroids Dojo",
+  "homepage": "https://github.com/Randroids-Dojo/Godot-Claude-Skills",
+  "repository": "https://github.com/Randroids-Dojo/Godot-Claude-Skills",
+  "license": "MIT",
+  "keywords": [
+    "godot",
+    "game-development",
+    "gdunit4",
+    "testing",
+    "gdscript",
+    "game-engine",
+    "ci-cd",
+    "vercel",
+    "web-export"
+  ],
+  "category": "development"
+}

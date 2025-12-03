@@ -1,0 +1,13 @@
+{
+  "name": "godot-claude-skills",
+  "owner": {
+    "name": "Randroids Dojo"
+  },
+  "plugins": [
+    {
+      "name": "godot-skills",
+      "source": ".",
+      "description": "Develop, test, build, and deploy Godot 4.x games with GdUnit4 testing, web exports, and CI/CD."
+    }
+  ]
+}

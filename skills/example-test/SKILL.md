@@ -1,5 +1,6 @@
 ---
 name: example-test
+version: 1.0.0
 description: Test and validate Godot projects by building, running, and analyzing logs. Use this skill when building Godot projects, checking for errors, reading game logs, or validating game functionality.
 ---
 
