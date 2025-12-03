@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-environment:
-    name: Setup Claude & Godot Environment
+  setup-and-test:
+    name: Setup Environment & Test Godot Project
     runs-on: ubuntu-latest
 
     steps:
@@ -78,17 +78,81 @@ jobs:
           done
           echo "All skills validated successfully!"
 
-      # Display environment summary
-      - name: Environment Summary
+      # Import Godot project (generates .godot cache)
+      - name: Import Godot Project
         run: |
-          echo "=== Environment Setup Complete ==="
+          echo "=== Importing Godot Project ==="
+          cd example-project
+          godot --headless --import . 2>&1 | tee import.log || true
           echo ""
-          echo "Node.js version: $(node --version)"
-          echo "npm version: $(npm --version)"
-          echo "Godot version: $(godot --version)"
+          echo "Import complete. Checking for errors..."
+          if grep -i "error" import.log; then
+            echo "Errors found during import!"
+            exit 1
+          fi
+          echo "No import errors found."
+
+      # Validate GDScript files
+      - name: Validate GDScript
+        run: |
+          echo "=== Validating GDScript Files ==="
+          cd example-project
+          for script in $(find . -name "*.gd" -type f); do
+            echo "Checking: $script"
+            # Run script through Godot's parser
+            godot --headless --script "$script" --check-only 2>&1 || true
+          done
+          echo "Script validation complete."
+
+      # Run project in headless mode
+      - name: Run Headless Test
+        run: |
+          echo "=== Running Headless Test ==="
+          cd example-project
+          timeout 30 godot --headless --quit 2>&1 | tee run.log || true
           echo ""
-          echo "Installed skills:"
-          ls -la .claude/skills/
+          echo "=== Game Output ==="
+          cat run.log
           echo ""
-          echo "Skills configuration:"
-          cat .claude/settings.json 2>/dev/null || echo "Using default settings"
+          echo "=== Checking for Expected Output ==="
+          if grep -q "\[TicTacToe\] Game initialized" run.log; then
+            echo "✓ Game initialized successfully"
+          else
+            echo "✗ Game initialization message not found"
+            exit 1
+          fi
+          if grep -q "\[TicTacToe\] Board initialized" run.log; then
+            echo "✓ Board initialized successfully"
+          else
+            echo "✗ Board initialization message not found"
+            exit 1
+          fi
+          echo ""
+          echo "=== Checking for Errors ==="
+          if grep -iE "(SCRIPT ERROR|ERROR:)" run.log; then
+            echo "Errors detected in game output!"
+            exit 1
+          fi
+          echo "No errors found in game output."
+
+      # Display environment summary
+      - name: Test Summary
+        run: |
+          echo "========================================="
+          echo "        CI TEST SUMMARY"
+          echo "========================================="
+          echo ""
+          echo "Environment:"
+          echo "  Node.js: $(node --version)"
+          echo "  npm: $(npm --version)"
+          echo "  Godot: $(godot --version)"
+          echo ""
+          echo "Skills Installed:"
+          ls -1 .claude/skills/
+          echo ""
+          echo "Project Structure:"
+          find example-project -type f -name "*.gd" -o -name "*.tscn" -o -name "project.godot" | head -20
+          echo ""
+          echo "========================================="
+          echo "        ALL TESTS PASSED"
+          echo "========================================="

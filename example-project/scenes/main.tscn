@@ -1,0 +1,118 @@
+[gd_scene load_steps=2 format=3 uid="uid://main_scene"]
+
+[ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_game")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.17, 0.22, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Tic Tac Toe"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Player X's Turn"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameBoard" type="CenterContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/GameBoard"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 3
+
+[node name="Cell0" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell1" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell2" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell3" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell4" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell5" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell6" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell7" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="Cell8" type="Button" parent="VBoxContainer/GameBoard/GridContainer"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = ""
+
+[node name="RestartButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "Restart Game"

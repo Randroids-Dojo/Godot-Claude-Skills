@@ -1,0 +1,10 @@
+<svg height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="124" height="124" rx="14" fill="#363d52" stroke="#212532" stroke-width="4"/>
+  <g transform="scale(0.4) translate(80, 80)">
+    <!-- X symbol -->
+    <line x1="20" y1="20" x2="80" y2="80" stroke="#e74c3c" stroke-width="12" stroke-linecap="round"/>
+    <line x1="80" y1="20" x2="20" y2="80" stroke="#e74c3c" stroke-width="12" stroke-linecap="round"/>
+    <!-- O symbol -->
+    <circle cx="180" cy="50" r="30" fill="none" stroke="#3498db" stroke-width="12"/>
+  </g>
+</svg>

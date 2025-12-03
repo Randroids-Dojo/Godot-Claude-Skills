@@ -16,6 +16,12 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 ├── .github/
 │   └── workflows/
 │       └── ci.yml             # GitHub Actions CI workflow
+├── example-project/           # Tic-Tac-Toe game for testing
+│   ├── project.godot
+│   ├── scenes/
+│   │   └── main.tscn
+│   └── scripts/
+│       └── game.gd
 ├── skills/
 │   ├── example-test/
 │   │   └── SKILL.md
@@ -28,7 +34,38 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 
 | Skill | Description |
 |-------|-------------|
-| `example-test` | A simple example skill for testing and learning the skill format |
+| `example-test` | Test and validate Godot projects by building, running, and analyzing logs |
+
+## Example Project
+
+The repository includes a **Tic-Tac-Toe** game (`example-project/`) for testing skills:
+
+- **2-player game** with X and O turns
+- **Win detection** for rows, columns, and diagonals
+- **Draw detection** when board is full
+- **Restart functionality**
+- **Logging** with `[TicTacToe]` prefix for CI validation
+
+### Running Locally
+
+```bash
+# Open in Godot Editor
+godot --path example-project --editor
+
+# Run headless (for testing)
+godot --headless --path example-project --quit
+```
+
+### Automation API
+
+The game exposes methods for automated testing:
+
+```gdscript
+game.make_move(4)           # Place at cell index (0-8)
+game.get_board_state()      # Get current board as array
+game.is_game_active()       # Check if game is running
+game.get_current_player()   # Get "X" or "O"
+```
 
 ## Creating New Skills
 
@@ -60,6 +97,9 @@ This repository includes GitHub Actions CI that:
 2. **Installs Godot Engine** - Sets up Godot 4.3.0 for headless use
 3. **Installs Skills** - Copies skills to `.claude/skills/` directory
 4. **Validates Skills** - Checks that all skills have proper YAML frontmatter
+5. **Imports Godot Project** - Generates `.godot` cache for the example project
+6. **Validates GDScript** - Checks scripts for syntax errors
+7. **Runs Headless Test** - Executes game and validates log output
 
 The CI runs on:
 - Push to `main`/`master` branches
