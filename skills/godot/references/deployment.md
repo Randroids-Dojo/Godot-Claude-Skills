@@ -66,11 +66,45 @@ build/
 
 Best for: Fast global CDN, preview deployments, GitHub integration.
 
-#### Setup
+#### Initial Setup
 
-1. Create account at [vercel.com](https://vercel.com)
-2. Install CLI: `npm i -g vercel`
-3. Get token: Account Settings → Tokens
+1. **Create Vercel Account**
+   - Go to [vercel.com](https://vercel.com) and sign up
+   - Connect your GitHub account for easy project imports
+
+2. **Install Vercel CLI**
+   ```bash
+   npm i -g vercel
+   ```
+
+3. **Link Your Project**
+   ```bash
+   # Navigate to your build output directory
+   cd example-project/build
+
+   # Link to Vercel (creates .vercel/project.json)
+   vercel link
+   ```
+
+   Follow the prompts to:
+   - Log in to Vercel
+   - Select your scope (personal or team)
+   - Link to existing project or create new one
+
+4. **Get Project IDs**
+   After linking, check `.vercel/project.json`:
+   ```json
+   {
+     "orgId": "your-org-id",
+     "projectId": "your-project-id"
+   }
+   ```
+
+5. **Create API Token**
+   - Go to [vercel.com/account/tokens](https://vercel.com/account/tokens)
+   - Click "Create Token"
+   - Name it (e.g., "GitHub Actions")
+   - Copy the token (shown only once)
 
 #### Manual Deploy
 
@@ -115,7 +149,22 @@ jobs:
         run: |
           npm i -g vercel
           vercel deploy ./build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 ```
+
+#### GitHub Repository Setup
+
+To enable automatic Vercel deployments from GitHub Actions:
+
+1. **Add Secrets** (Settings → Secrets and variables → Actions → New repository secret):
+   - `VERCEL_TOKEN` - Your Vercel API token
+   - `VERCEL_ORG_ID` - From `.vercel/project.json` after `vercel link`
+   - `VERCEL_PROJECT_ID` - From `.vercel/project.json` after `vercel link`
+
+2. **Add Variables** (Settings → Secrets and variables → Actions → Variables tab):
+   - `ENABLE_VERCEL_DEPLOY` = `true`
 
 #### Preview Deployments (PRs)
 

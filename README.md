@@ -75,6 +75,26 @@ godot --headless --export-release "Web" ./build/index.html
 vercel deploy ./build --prod
 ```
 
+### Vercel Deployment Setup
+
+To enable automatic Vercel deployment from GitHub Actions:
+
+1. Install Vercel CLI and link project:
+   ```bash
+   npm i -g vercel
+   vercel link
+   ```
+
+2. Add GitHub repository secrets (Settings → Secrets → Actions):
+   - `VERCEL_TOKEN` - Get from [vercel.com/account/tokens](https://vercel.com/account/tokens)
+   - `VERCEL_ORG_ID` - From `.vercel/project.json`
+   - `VERCEL_PROJECT_ID` - From `.vercel/project.json`
+
+3. Add GitHub repository variable:
+   - `ENABLE_VERCEL_DEPLOY` = `true`
+
+See [deployment.md](skills/godot/references/deployment.md) for detailed instructions.
+
 ## Example Project
 
 The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full test coverage:
