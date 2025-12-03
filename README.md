@@ -1,6 +1,6 @@
 # Godot-Claude-Skills
 
-A collection of Claude Code skills for Godot Engine game development.
+A Claude Code skill for Godot Engine game development.
 
 ## What are Skills?
 
@@ -13,9 +13,6 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 ├── .claude-plugin/
 │   ├── plugin.json            # Plugin metadata for marketplace
 │   └── marketplace.json       # Marketplace registry info
-├── .claude/
-│   ├── settings.json          # Claude Code project settings
-│   └── skills/                # Skills installed for local use
 ├── .github/
 │   └── workflows/
 │       └── ci.yml             # GitHub Actions CI workflow
@@ -25,27 +22,18 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 │   ├── scenes/
 │   └── scripts/
 ├── skills/
-│   ├── godot/                 # Main Godot development skill
-│   │   ├── SKILL.md
-│   │   ├── scripts/           # Python helper scripts
-│   │   └── references/        # Documentation
-│   └── example-test/          # Simple example skill
-│       └── SKILL.md
+│   └── godot/                 # Godot development skill
+│       ├── SKILL.md
+│       ├── scripts/           # Python helper scripts
+│       └── references/        # Documentation
 ├── LICENSE                    # MIT License
 ├── CHANGELOG.md               # Version history
 └── README.md
 ```
 
-## Available Skills
-
-| Skill | Description |
-|-------|-------------|
-| `godot` | Develop, test, build, and deploy Godot 4.x games with GdUnit4, web exports, and CI/CD |
-| `example-test` | Simple example skill for testing and learning the skill format |
-
 ## Godot Skill
 
-The main skill for Godot game development. Includes:
+Develop, test, build, and deploy Godot 4.x games. Includes:
 
 - **GdUnit4 integration** - Unit tests, scene tests, input simulation
 - **Web/Desktop exports** - Build and export games
@@ -94,7 +82,7 @@ The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full te
 - **2-player game** with X and O turns
 - **Win detection** for rows, columns, and diagonals
 - **Draw detection** when board is full
-- **GdUnit4 tests** - 15+ unit and integration tests
+- **GdUnit4 tests** - Unit and integration tests
 - **Web export** - Deployable to Vercel
 
 ### Running Locally
@@ -111,7 +99,7 @@ cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 ```
 
-## Installing the Skills
+## Installing the Skill
 
 ### Option 1: Plugin Marketplace (Recommended)
 
@@ -125,11 +113,11 @@ Install via Claude Code's plugin system:
 /plugin install godot-skills
 ```
 
-The skills will be automatically available in all your Claude Code sessions.
+The skill will be automatically available in all your Claude Code sessions.
 
 ### Option 2: Personal Installation
 
-Install skills for all your projects:
+Install for all your projects:
 
 ```bash
 # Clone this repo
@@ -141,7 +129,7 @@ cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
 
 ### Option 3: Project-Level Installation
 
-Install skills for a specific project (shared with team via git):
+Install for a specific project (shared with team via git):
 
 ```bash
 # Clone this repo
@@ -172,20 +160,12 @@ The CI runs on:
 - Pull requests to `main`/`master` branches
 - Manual trigger via `workflow_dispatch`
 
-## Future: PlayGodot
-
-We're planning **PlayGodot** - an external automation framework for Godot (like Playwright for web apps). See `PlayGodot-README.md` for architecture and roadmap.
-
-```python
-# Future API
-async with Godot.launch("path/to/project") as game:
-    await game.click("/root/UI/StartButton")
-    await game.wait_for_signal("game_started")
-```
-
 ## Resources
 
-- [Claude Code Skills Documentation](https://www.claude.com/blog/skills)
-- [Anthropic Skills Repository](https://github.com/anthropics/skills)
+- [Claude Code Skills Documentation](https://docs.anthropic.com/en/docs/claude-code/skills)
 - [GdUnit4 Documentation](https://mikeschulze.github.io/gdUnit4/)
 - [Godot Engine Documentation](https://docs.godotengine.org/)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.

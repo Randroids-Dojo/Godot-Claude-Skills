@@ -17,13 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Python helper scripts: `run_tests.py`, `parse_results.py`, `export_build.py`, `validate_project.py`
   - Reference documentation for GdUnit4 quickstart, assertions, scene runner API
 
-- **Example Test Skill** (`skills/example-test/`)
-  - Simple example skill demonstrating skill structure and format
-  - Basic Godot project validation and log analysis
-
 - **Example Project** (`example-project/`)
-  - Tic-Tac-Toe game for testing skills in CI
-  - Full GdUnit4 test suite with unit and integration tests
+  - Tic-Tac-Toe game for testing the skill in CI
+  - GdUnit4 test suite with unit and integration tests
   - Web export preset configuration
   - Vercel deployment configuration with CORS headers
 
@@ -40,4 +36,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 - Comprehensive README with installation instructions
-- PlayGodot architecture document for future external automation framework
