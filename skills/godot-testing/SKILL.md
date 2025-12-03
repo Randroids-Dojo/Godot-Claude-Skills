@@ -1,11 +1,11 @@
 ---
 name: godot-testing
-description: Test Godot projects using GdUnit4 framework. Use when writing tests, running test suites, simulating input, validating game behavior, or setting up CI pipelines for Godot games.
+description: Test, build, and deploy Godot projects. Use for writing GdUnit4 tests, running test suites, simulating input, exporting web builds, deploying to Vercel/GitHub Pages, or setting up CI pipelines.
 ---
 
 # Godot Testing Skill
 
-Test Godot 4.x projects using GdUnit4 for unit tests, integration tests, and scene testing with input simulation.
+Test, build, and deploy Godot 4.x projects. Includes GdUnit4 testing, web exports, and deployment to various platforms.
 
 ## Quick Reference
 
@@ -214,12 +214,44 @@ python skills/godot-testing/scripts/run_tests.py --project ./example-project
 
 3. Create `test/` directory and add test files
 
+## Exporting & Deployment
+
+### Web Export
+
+```bash
+# Export to web (requires export_presets.cfg)
+godot --headless --export-release "Web" ./build/index.html
+
+# Using helper script
+python scripts/export_build.py --project . --preset Web --output ./build/index.html
+```
+
+### Deploy to Vercel
+
+```bash
+npm i -g vercel
+vercel deploy ./build --prod
+```
+
+### Export Preset (export_presets.cfg)
+
+```ini
+[preset.0]
+name="Web"
+platform="Web"
+runnable=true
+export_path="build/index.html"
+```
+
+See `references/deployment.md` for full Vercel, GitHub Pages, and itch.io setup.
+
 ## References
 
 - `references/gdunit4-quickstart.md` - Installation and setup
 - `references/scene-runner.md` - Full input simulation API
 - `references/assertions.md` - All assertion methods
 - `references/ci-integration.md` - CI/CD configuration
+- `references/deployment.md` - Web export and deployment guide
 
 ## Future: PlayGodot
 
