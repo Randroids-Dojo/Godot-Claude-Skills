@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  setup-environment:
+    name: Setup Claude & Godot Environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js for Claude CLI
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Install Claude CLI globally
+      - name: Install Claude CLI
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          echo "Claude CLI installed successfully"
+
+      # Verify Claude CLI installation
+      - name: Verify Claude CLI
+        run: |
+          claude --version || echo "Claude CLI installed (version check may require auth)"
+
+      # Setup Godot Engine
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      # Verify Godot installation
+      - name: Verify Godot
+        run: |
+          godot --version
+          echo "Godot Engine installed successfully"
+
+      # Install skills to .claude/skills directory
+      - name: Install Claude Skills
+        run: |
+          mkdir -p .claude/skills
+          cp -r skills/* .claude/skills/
+          echo "Skills installed:"
+          find .claude/skills -name "SKILL.md" -type f
+
+      # Validate skill format
+      - name: Validate Skills
+        run: |
+          echo "Validating skill files..."
+          for skill_file in .claude/skills/*/SKILL.md; do
+            if [ -f "$skill_file" ]; then
+              # Check for YAML frontmatter
+              if head -1 "$skill_file" | grep -q "^---$"; then
+                # Check for required fields
+                if grep -q "^name:" "$skill_file" && grep -q "^description:" "$skill_file"; then
+                  echo "✓ Valid: $skill_file"
+                else
+                  echo "✗ Missing required fields in: $skill_file"
+                  exit 1
+                fi
+              else
+                echo "✗ Missing YAML frontmatter in: $skill_file"
+                exit 1
+              fi
+            fi
+          done
+          echo "All skills validated successfully!"
+
+      # Display environment summary
+      - name: Environment Summary
+        run: |
+          echo "=== Environment Setup Complete ==="
+          echo ""
+          echo "Node.js version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "Godot version: $(godot --version)"
+          echo ""
+          echo "Installed skills:"
+          ls -la .claude/skills/
+          echo ""
+          echo "Skills configuration:"
+          cat .claude/settings.json 2>/dev/null || echo "Using default settings"
