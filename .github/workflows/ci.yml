@@ -165,6 +165,35 @@ jobs:
           fi
           echo "Tests completed."
 
+      # Clone PlayGodot for external testing
+      - name: Setup PlayGodot
+        run: |
+          echo "=== Setting up PlayGodot ==="
+          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git ../PlayGodot
+          cd ../PlayGodot/python
+          pip install -e ".[dev]"
+          echo "PlayGodot installed successfully"
+
+      # Run PlayGodot pytest tests (using addon protocol in CI)
+      - name: Run PlayGodot Tests
+        run: |
+          echo "=== Running PlayGodot External Tests ==="
+          cd example-project
+          # Use addon protocol in CI (native requires our fork)
+          export PLAYGODOT_ADDON=1
+          # Run pytest with verbose output
+          python -m pytest tests/ -v --tb=short 2>&1 | tee pytest.log || true
+          echo ""
+          echo "=== PlayGodot Test Output ==="
+          cat pytest.log
+          echo ""
+          # Check for failures
+          if grep -qE "(FAILED|ERROR)" pytest.log; then
+            echo "Some PlayGodot tests failed!"
+            exit 1
+          fi
+          echo "PlayGodot tests completed."
+
       # Parse and display test results
       - name: Parse Test Results
         if: always()
@@ -185,6 +214,15 @@ jobs:
         with:
           name: test-reports
           path: example-project/reports/
+          if-no-files-found: ignore
+
+      # Upload PlayGodot test logs
+      - name: Upload PlayGodot Test Logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playgodot-logs
+          path: example-project/pytest.log
           if-no-files-found: ignore
 
       # Display test summary
