@@ -10,7 +10,7 @@ Configuration:
         export GODOT_PATH=/path/to/godot/bin/godot.macos.editor.arm64
 
     Or pass it as a command-line argument:
-        python run_game_demo.py --godot-path /path/to/godot
+        python test_playgodot_demo.py --godot-path /path/to/godot
 
     If PlayGodot is not installed via pip, set PLAYGODOT_PATH:
         export PLAYGODOT_PATH=/path/to/PlayGodot/python
@@ -66,7 +66,7 @@ def get_godot_path(args_godot_path: str | None) -> str:
         print("  export GODOT_PATH=/path/to/godot/bin/godot.macos.editor.arm64")
         print("")
         print("Or pass it as a command-line argument:")
-        print("  python run_game_demo.py --godot-path /path/to/godot")
+        print("  python test_playgodot_demo.py --godot-path /path/to/godot")
         print("")
         print("To build the custom Godot:")
         print("  git clone https://github.com/Randroids-Dojo/godot.git")
@@ -106,7 +106,8 @@ setup_playgodot_path()
 
 from playgodot import Godot
 
-GODOT_PROJECT = Path(__file__).parent / "example-project"
+# Script is in example-project/tests/, project is parent directory
+GODOT_PROJECT = Path(__file__).parent.parent
 SCREENSHOT_DIR = Path(__file__).parent / "screenshots"
 
 
