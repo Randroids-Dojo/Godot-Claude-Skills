@@ -430,9 +430,12 @@ jobs:
           chmod +x godot.linuxbsd.editor.x86_64.mono
           echo "GODOT_PATH=$(pwd)/godot.linuxbsd.editor.x86_64.mono" >> $GITHUB_ENV
 
-      - name: Install PlayGodot
+      - name: Clone and Install PlayGodot
         run: |
-          pip install playgodot pytest pytest-asyncio
+          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git
+          cd PlayGodot/python
+          pip install -e .
+          pip install pytest pytest-asyncio
 
       - name: Import Godot Project
         run: |
