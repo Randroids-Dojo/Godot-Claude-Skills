@@ -130,7 +130,7 @@ Install via Claude Code's plugin system:
 /plugin marketplace add Randroids-Dojo/Godot-Claude-Skills
 
 # Install the plugin
-/plugin install godot-skills
+/plugin install godot
 ```
 
 The skill will be automatically available in all your Claude Code sessions.
