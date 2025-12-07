@@ -74,12 +74,11 @@ async def test_click_on_node(game):
 
 
 @pytest.mark.asyncio
-async def test_press_key(game):
-    """Test pressing a key (uses restart button click instead of R key)."""
+async def test_restart_button(game):
+    """Test clicking the restart button resets the game."""
     await game.call("/root/Game", "make_move", [0])
     assert (await game.call("/root/Game", "get_board_state"))[0] == "X"
 
-    # Click the restart button instead of pressing R key
     await game.click("/root/Game/VBoxContainer/RestartButton")
     await asyncio.sleep(0.2)
 
