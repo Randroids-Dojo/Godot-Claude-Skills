@@ -1,7 +1,7 @@
 ---
 name: godot
-version: 1.0.0
-description: Develop, test, build, and deploy Godot 4.x games. Includes GdUnit4 testing with input simulation, web/desktop exports, CI/CD pipelines, and deployment to Vercel/GitHub Pages/itch.io. Use when working with Godot Engine projects, writing GDScript, running tests, or deploying games.
+version: 1.1.0
+description: Develop, test, build, and deploy Godot 4.x games. Includes GdUnit4 testing with input simulation, PlayGodot Python testing with native debugger protocol, web/desktop exports, CI/CD pipelines, and deployment to Vercel/GitHub Pages/itch.io. Use when working with Godot Engine projects, writing GDScript, running tests, or deploying games.
 ---
 
 # Godot Skill
@@ -248,7 +248,7 @@ See `references/deployment.md` for full Vercel, GitHub Pages, and itch.io setup.
 
 ## External Testing with PlayGodot
 
-PlayGodot enables testing Godot games from Python using pytest, supporting both WebSocket addon and native RemoteDebugger protocols.
+PlayGodot enables testing Godot games from Python using pytest. It uses Godot's native RemoteDebugger protocol for automation, requiring a Godot build with automation support.
 
 ### Setup
 
@@ -269,7 +269,7 @@ from pathlib import Path
 from playgodot import Godot
 
 GODOT_PROJECT = Path(__file__).parent.parent
-GODOT_PATH = "/path/to/godot"  # or use system godot
+GODOT_PATH = "/path/to/godot-fork"  # Godot with automation support
 
 @pytest_asyncio.fixture
 async def game():
@@ -278,7 +278,6 @@ async def game():
         headless=True,
         timeout=15.0,
         godot_path=GODOT_PATH,
-        native=True,  # Use native RemoteDebugger protocol
     ) as g:
         await g.wait_for_node("/root/Game")
         yield g
@@ -321,40 +320,54 @@ async def test_game_win(game):
 ### PlayGodot API
 
 ```python
-# Wait for nodes
+# Node interaction
+node = await game.get_node("/root/Game")
 await game.wait_for_node("/root/Game", timeout=10.0)
-
-# Call methods
 result = await game.call("/root/Node", "method_name", [arg1, arg2])
+value = await game.get_property("/root/Node", "property_name")
+await game.set_property("/root/Node", "property_name", new_value)
 
-# Get/set properties
-value = await game.get("/root/Node", "property_name")
-await game.set("/root/Node", "property_name", new_value)
+# Node queries
+paths = await game.query_nodes("*Button*")  # Find nodes matching pattern
+count = await game.count_nodes("*Label*")   # Count matching nodes
 
 # Input simulation
-await game.click("/root/Button")           # Click node
-await game.click(300, 200)                 # Click coordinates
+await game.click("/root/Button")           # Click node by path
+await game.click(300, 200)                 # Click at coordinates
+await game.double_click("/root/Button")    # Double-click
+await game.right_click(100, 100)           # Right-click
+await game.drag("/root/Item", "/root/Slot") # Drag and drop
 await game.press_key("space")              # Press key
-await game.press_action("jump")            # Press input action
+await game.press_key("ctrl+s")             # Key with modifier
 await game.type_text("hello")              # Type text
+await game.press_action("jump")            # Press input action
+await game.hold_action("sprint", 2.0)      # Hold action for duration
 
-# Get node info
-node = await game.get_node("/root/Game")
-tree = await game.get_tree()
-```
+# Touch input
+await game.tap(300, 200)                   # Touch tap
+await game.swipe(100, 100, 400, 100)       # Swipe gesture
+await game.pinch((200, 200), 0.5)          # Pinch gesture (zoom out)
 
-### Native vs Addon Protocol
+# Scene tree
+tree = await game.get_tree()               # Get scene tree structure
 
-```python
-# Native protocol (requires Godot fork with automation)
-# Uses --remote-debug tcp://127.0.0.1:6007
-async with Godot.launch(project, native=True) as g:
-    pass
+# Screenshots
+png_bytes = await game.screenshot()                    # Capture viewport
+await game.screenshot("/tmp/screenshot.png")           # Save to file
+await game.screenshot(node="/root/Game/UI")            # Capture specific node
 
-# WebSocket addon protocol (requires playgodot addon)
-# Uses WebSocket on port 9999
-async with Godot.launch(project, native=False) as g:
-    pass
+# Scene management
+scene_info = await game.get_current_scene()  # Returns {"path": "...", "name": "..."}
+await game.change_scene("res://scenes/level2.tscn")
+await game.reload_scene()
+
+# Game state control
+await game.pause()                         # Pause game
+await game.unpause()                       # Resume game
+is_paused = await game.is_paused()         # Check pause state
+await game.set_time_scale(0.5)             # Slow motion
+await game.set_time_scale(2.0)             # Speed up
+scale = await game.get_time_scale()        # Get current scale
 ```
 
 ### Running PlayGodot Tests
@@ -366,8 +379,8 @@ pytest tests/ -v
 # Run specific test
 pytest tests/test_game.py::test_clicking_cell_makes_move -v
 
-# Use addon protocol instead of native
-PLAYGODOT_ADDON=1 pytest tests/ -v
+# With timeout
+pytest tests/ -v --timeout=60
 ```
 
 ## References

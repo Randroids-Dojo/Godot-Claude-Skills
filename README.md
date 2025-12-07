@@ -36,6 +36,7 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 Develop, test, build, and deploy Godot 4.x games. Includes:
 
 - **GdUnit4 integration** - Unit tests, scene tests, input simulation
+- **PlayGodot testing** - Python/pytest testing via native debugger protocol
 - **Web/Desktop exports** - Build and export games
 - **CI/CD pipelines** - GitHub Actions workflows
 - **Deployment** - Vercel, GitHub Pages, itch.io
@@ -58,11 +59,38 @@ func test_player_health() -> void:
 ### Running Tests
 
 ```bash
-# Run all tests
+# Run all tests with GdUnit4
 godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 
 # Using helper script
 python skills/godot/scripts/run_tests.py --project ./my-game
+```
+
+### PlayGodot Python Testing
+
+Test Godot games from Python using pytest with PlayGodot:
+
+```python
+import pytest
+from playgodot import Godot
+
+@pytest.mark.asyncio
+async def test_game_state():
+    async with Godot.launch("./my-game", headless=True) as game:
+        await game.wait_for_node("/root/Game")
+
+        # Call game methods
+        result = await game.call("/root/Game", "get_score")
+        assert result == 0
+
+        # Simulate input
+        await game.click("/root/Game/StartButton")
+        await game.press_key("space")
+```
+
+```bash
+# Run PlayGodot tests
+pytest tests/ -v
 ```
 
 ### Building & Deploying
@@ -103,6 +131,7 @@ The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full te
 - **Win detection** for rows, columns, and diagonals
 - **Draw detection** when board is full
 - **GdUnit4 tests** - Unit and integration tests
+- **PlayGodot tests** - Python/pytest integration tests
 - **Web export** - Deployable to Vercel
 
 ### Running Locally
@@ -117,6 +146,10 @@ godot --headless --path example-project --quit
 # Run GdUnit4 tests (after installing GdUnit4)
 cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
+
+# Run PlayGodot tests (requires godot-fork with automation support)
+cd example-project
+pytest tests/ -v
 ```
 
 ## Installing the Skill

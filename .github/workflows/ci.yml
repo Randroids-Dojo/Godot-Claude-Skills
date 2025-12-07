@@ -165,34 +165,21 @@ jobs:
           fi
           echo "Tests completed."
 
-      # Clone PlayGodot for external testing
-      - name: Setup PlayGodot
+      # NOTE: PlayGodot tests require a Godot build with automation support
+      # These tests are skipped in CI but can be run locally with the Godot fork
+      # See: https://github.com/Randroids-Dojo/PlayGodot for setup instructions
+      - name: Skip PlayGodot Tests (requires Godot fork)
         run: |
-          echo "=== Setting up PlayGodot ==="
-          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git ../PlayGodot
-          cd ../PlayGodot/python
-          pip install -e ".[dev]"
-          echo "PlayGodot installed successfully"
-
-      # Run PlayGodot pytest tests (using addon protocol in CI)
-      - name: Run PlayGodot Tests
-        run: |
-          echo "=== Running PlayGodot External Tests ==="
-          cd example-project
-          # Use addon protocol in CI (native requires our fork)
-          export PLAYGODOT_ADDON=1
-          # Run pytest with verbose output
-          python -m pytest tests/ -v --tb=short 2>&1 | tee pytest.log || true
+          echo "=== PlayGodot Tests ==="
+          echo "PlayGodot uses Godot's native RemoteDebugger protocol for automation."
+          echo "This requires a Godot build with automation support (our fork)."
           echo ""
-          echo "=== PlayGodot Test Output ==="
-          cat pytest.log
+          echo "To run PlayGodot tests locally:"
+          echo "  1. Build or install the Godot fork with automation support"
+          echo "  2. pip install playgodot"
+          echo "  3. cd example-project && pytest tests/ -v"
           echo ""
-          # Check for failures
-          if grep -qE "(FAILED|ERROR)" pytest.log; then
-            echo "Some PlayGodot tests failed!"
-            exit 1
-          fi
-          echo "PlayGodot tests completed."
+          echo "Skipping PlayGodot tests in CI (GdUnit4 tests cover the same functionality)"
 
       # Parse and display test results
       - name: Parse Test Results
@@ -214,15 +201,6 @@ jobs:
         with:
           name: test-reports
           path: example-project/reports/
-          if-no-files-found: ignore
-
-      # Upload PlayGodot test logs
-      - name: Upload PlayGodot Test Logs
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playgodot-logs
-          path: example-project/pytest.log
           if-no-files-found: ignore
 
       # Display test summary
