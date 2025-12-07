@@ -246,9 +246,10 @@ jobs:
           curl -L -o godot.zip \
             "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
           unzip godot.zip
-          chmod +x godot.linuxbsd.editor.x86_64
+          # Binary is the mono version
+          chmod +x godot.linuxbsd.editor.x86_64.mono
           ls -la
-          ./godot.linuxbsd.editor.x86_64 --version || echo "Version check requires display"
+          ./godot.linuxbsd.editor.x86_64.mono --version || echo "Version check requires display"
 
       - name: Clone PlayGodot
         run: |
@@ -266,7 +267,7 @@ jobs:
           echo "=== Importing Godot Project ==="
           cd example-project
           # Use Xvfb for headless display
-          xvfb-run --auto-servernum ../godot-automation/godot.linuxbsd.editor.x86_64 \
+          xvfb-run --auto-servernum ../godot-automation/godot.linuxbsd.editor.x86_64.mono \
             --headless --import . --quit 2>&1 || true
           echo "Import complete"
 
@@ -274,7 +275,7 @@ jobs:
         run: |
           echo "=== Running PlayGodot Integration Tests ==="
           cd example-project
-          export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64"
+          export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64.mono"
           # Run with xvfb for headless display support
           xvfb-run --auto-servernum pytest tests/test_playgodot_demo.py -v --tb=short 2>&1 || true
           # For now, don't fail on test errors while we stabilize CI
