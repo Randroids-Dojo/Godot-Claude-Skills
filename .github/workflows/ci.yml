@@ -391,6 +391,75 @@ jobs:
           echo ""
           echo "========================================="
 
+  # Claude Code Agent Test - runs the game using Claude with the godot skill
+  claude-agent-test:
+    name: Claude Agent Test
+    runs-on: ubuntu-latest
+    needs: test
+    # Only run if ANTHROPIC_API_KEY is configured and enabled
+    if: vars.ENABLE_CLAUDE_AGENT_TEST == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Download Godot Automation Build
+        run: |
+          echo "=== Downloading Godot with Automation Support ==="
+          mkdir -p godot-automation
+          cd godot-automation
+          curl -L -o godot.zip \
+            "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
+          unzip godot.zip
+          chmod +x godot.linuxbsd.editor.x86_64.mono
+          echo "GODOT_PATH=$(pwd)/godot.linuxbsd.editor.x86_64.mono" >> $GITHUB_ENV
+
+      - name: Install PlayGodot
+        run: |
+          pip install playgodot pytest pytest-asyncio
+
+      - name: Import Godot Project
+        run: |
+          cd example-project
+          xvfb-run --auto-servernum $GODOT_PATH --headless --import . --quit 2>&1 || true
+
+      - name: Install Claude Skills
+        run: |
+          mkdir -p .claude/skills
+          cp -r skills/* .claude/skills/
+          echo "Skills installed:"
+          find .claude/skills -name "SKILL.md" -type f
+
+      - name: Run Claude Agent with PlayGodot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GODOT_PATH: ${{ env.GODOT_PATH }}
+        run: |
+          echo "=== Running Claude Code Agent with Godot Skill (PlayGodot) ==="
+          cd example-project
+
+          # Run Claude with a prompt to use the godot skill with PlayGodot
+          # --print outputs only the final response
+          # --dangerously-skip-permissions skips permission prompts for CI
+          claude --print --dangerously-skip-permissions \
+            "Use the godot skill with PlayGodot to launch the tic-tac-toe game (headless=True), click on cell 4 (center), and verify the board state shows an X in position 4. The GODOT_PATH environment variable is already set."
+
+          echo ""
+          echo "=== Claude Agent Test Complete ==="
+
   # PR Preview Deployments - creates a unique URL for each pull request
   # Requires the same Vercel secrets as the main deployment above
   preview-deploy:
