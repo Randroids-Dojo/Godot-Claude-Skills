@@ -5,9 +5,9 @@
   },
   "plugins": [
     {
-      "name": "godot-skills",
-      "source": ".",
-      "description": "Develop, test, build, and deploy Godot 4.x games with GdUnit4 testing, web exports, and CI/CD."
+      "name": "godot",
+      "source": "./skills/godot",
+      "description": "Develop, test, build, and deploy Godot 4.x games. Includes GdUnit4 testing with input simulation, PlayGodot Python testing, web/desktop exports, CI/CD pipelines, and deployment to Vercel/GitHub Pages/itch.io."
     }
   ]
 }
