@@ -36,7 +36,7 @@ Skills are folders of instructions, scripts, and resources that Claude loads dyn
 Develop, test, build, and deploy Godot 4.x games. Includes:
 
 - **GdUnit4 integration** - Unit tests, scene tests, input simulation
-- **PlayGodot testing** - Python/pytest testing via native debugger protocol
+- **PlayGodot automation** - Game automation framework for E2E testing (like Playwright for games)
 - **Web/Desktop exports** - Build and export games
 - **CI/CD pipelines** - GitHub Actions workflows
 - **Deployment** - Vercel, GitHub Pages, itch.io
@@ -66,9 +66,9 @@ godot --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tes
 python skills/godot/scripts/run_tests.py --project ./my-game
 ```
 
-### PlayGodot Python Testing
+### PlayGodot Game Automation
 
-Test Godot games from Python using pytest with PlayGodot. PlayGodot uses Godot's native debugger protocol for reliable automation without requiring any in-game addons.
+[PlayGodot](https://github.com/Randroids-Dojo/PlayGodot) is a game automation framework for Godot - like Playwright, but for games. Control games from Python, write E2E tests, capture screenshots, and simulate input via Godot's native debugger protocol.
 
 **Requirements:**
 - Custom Godot fork with automation support: [Randroids-Dojo/godot](https://github.com/Randroids-Dojo/godot) (automation branch)
@@ -143,7 +143,7 @@ The repository includes a **Tic-Tac-Toe** game (`example-project/`) with full te
 - **Win detection** for rows, columns, and diagonals
 - **Draw detection** when board is full
 - **GdUnit4 tests** - Unit and integration tests
-- **PlayGodot tests** - Python/pytest integration tests
+- **PlayGodot automation** - E2E tests via game automation framework
 - **Web export** - Deployable to Vercel
 
 ### Running Locally
@@ -159,7 +159,7 @@ godot --headless --path example-project --quit
 cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 
-# Run PlayGodot tests (requires Randroids-Dojo/godot automation branch)
+# Run PlayGodot E2E tests (requires Randroids-Dojo/godot automation branch)
 cd example-project
 pytest tests/ -v
 ```

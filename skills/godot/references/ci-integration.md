@@ -1,8 +1,12 @@
-# CI Integration for GdUnit4
+# CI Integration for Godot Testing
 
-## GitHub Actions
+This guide covers CI setup for both GdUnit4 (GDScript unit tests) and PlayGodot (game automation / E2E tests).
 
-### Basic Workflow
+---
+
+## GdUnit4 (Unit Testing)
+
+### GitHub Actions Basic Workflow
 
 ```yaml
 name: Tests
@@ -287,4 +291,157 @@ Ensure GdUnit4 is committed or installed:
       - name: Install GdUnit4
         run: |
           git clone --depth 1 https://github.com/MikeSchulze/gdUnit4.git addons/gdUnit4
+```
+
+---
+
+## PlayGodot (Game Automation / E2E Testing)
+
+PlayGodot requires a custom Godot build with automation support. You can either build it in CI or use pre-built binaries from releases.
+
+### GitHub Actions with Pre-built Binary
+
+```yaml
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download Godot Automation Build
+        run: |
+          mkdir -p godot-automation
+          cd godot-automation
+          curl -L -o godot.zip \
+            "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
+          unzip godot.zip
+          chmod +x godot.linuxbsd.editor.x86_64
+
+      - name: Install PlayGodot
+        run: |
+          pip install playgodot pytest pytest-asyncio
+          # Or from source:
+          # git clone https://github.com/Randroids-Dojo/PlayGodot.git
+          # pip install -e PlayGodot/python
+
+      - name: Import Project
+        run: |
+          xvfb-run godot-automation/godot.linuxbsd.editor.x86_64 \
+            --headless --import --path . --quit || true
+
+      - name: Run E2E Tests
+        run: |
+          export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64"
+          xvfb-run pytest tests/ -v --tb=short
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: tests/screenshots/
+          if-no-files-found: ignore
+```
+
+### Test Configuration (conftest.py)
+
+```python
+import os
+import pytest_asyncio
+from pathlib import Path
+from playgodot import Godot
+
+GODOT_PROJECT = Path(__file__).parent.parent
+GODOT_PATH = os.environ.get("GODOT_PATH")
+
+if not GODOT_PATH:
+    raise RuntimeError("GODOT_PATH environment variable not set")
+
+@pytest_asyncio.fixture
+async def game():
+    async with Godot.launch(
+        str(GODOT_PROJECT),
+        headless=True,
+        timeout=15.0,
+        godot_path=GODOT_PATH,
+    ) as g:
+        await g.wait_for_node("/root/Game")
+        yield g
+```
+
+### Running Both GdUnit4 and PlayGodot
+
+```yaml
+jobs:
+  unit-tests:
+    name: GdUnit4 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      # ... GdUnit4 setup and test steps ...
+
+  e2e-tests:
+    name: PlayGodot E2E Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests  # Run after unit tests pass
+    steps:
+      # ... PlayGodot setup and test steps ...
+```
+
+### Conditional PlayGodot Tests
+
+Enable/disable PlayGodot tests via repository variable:
+
+```yaml
+  e2e-tests:
+    runs-on: ubuntu-latest
+    if: vars.ENABLE_PLAYGODOT_TESTS != 'false'
+    # ...
+```
+
+### Common Issues
+
+**Issue: Display Errors**
+
+PlayGodot needs a display even in headless mode. Use xvfb:
+
+```yaml
+      - name: Run Tests
+        run: xvfb-run pytest tests/ -v
+```
+
+**Issue: Connection Timeout**
+
+Increase timeout in test configuration:
+
+```python
+async with Godot.launch(
+    str(GODOT_PROJECT),
+    timeout=30.0,  # Increase from default 15s
+) as g:
+    ...
+```
+
+**Issue: Screenshots Not Captured**
+
+Ensure screenshot directory exists:
+
+```python
+SCREENSHOT_DIR = Path(__file__).parent / "screenshots"
+SCREENSHOT_DIR.mkdir(exist_ok=True)
+
+await game.screenshot(str(SCREENSHOT_DIR / "test.png"))
 ```
