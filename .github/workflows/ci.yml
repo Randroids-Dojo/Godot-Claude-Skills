@@ -165,21 +165,14 @@ jobs:
           fi
           echo "Tests completed."
 
-      # NOTE: PlayGodot tests require a Godot build with automation support
-      # These tests are skipped in CI but can be run locally with the Godot fork
-      # See: https://github.com/Randroids-Dojo/PlayGodot for setup instructions
-      - name: Skip PlayGodot Tests (requires Godot fork)
+      # NOTE: PlayGodot integration tests run in a separate job
+      # They require a pre-built Godot with automation support
+      - name: PlayGodot Tests Info
         run: |
           echo "=== PlayGodot Tests ==="
-          echo "PlayGodot uses Godot's native RemoteDebugger protocol for automation."
-          echo "This requires a Godot build with automation support (our fork)."
-          echo ""
-          echo "To run PlayGodot tests locally:"
-          echo "  1. Build or install the Godot fork with automation support"
-          echo "  2. pip install playgodot"
-          echo "  3. cd example-project && pytest tests/ -v"
-          echo ""
-          echo "Skipping PlayGodot tests in CI (GdUnit4 tests cover the same functionality)"
+          echo "PlayGodot integration tests run in a separate job."
+          echo "They use a pre-built Godot with automation support from:"
+          echo "  https://github.com/Randroids-Dojo/godot/releases/tag/automation-latest"
 
       # Parse and display test results
       - name: Parse Test Results
@@ -225,6 +218,75 @@ jobs:
           echo "========================================="
           echo "        ALL TESTS PASSED"
           echo "========================================="
+
+  # PlayGodot Integration Tests
+  # Uses pre-built Godot with automation support from our fork
+  playgodot-tests:
+    name: PlayGodot Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    # Can be disabled by setting ENABLE_PLAYGODOT_TESTS=false
+    if: vars.ENABLE_PLAYGODOT_TESTS != 'false'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download Godot Automation Build
+        run: |
+          echo "=== Downloading Godot with Automation Support ==="
+          mkdir -p godot-automation
+          cd godot-automation
+          # Download from our fork's automation-latest release
+          curl -L -o godot.zip \
+            "https://github.com/Randroids-Dojo/godot/releases/download/automation-latest/godot-automation-linux-x86_64.zip"
+          unzip godot.zip
+          chmod +x godot.linuxbsd.editor.x86_64
+          ls -la
+          ./godot.linuxbsd.editor.x86_64 --version || echo "Version check requires display"
+
+      - name: Clone PlayGodot
+        run: |
+          echo "=== Cloning PlayGodot ==="
+          git clone --depth 1 https://github.com/Randroids-Dojo/PlayGodot.git
+
+      - name: Install PlayGodot
+        run: |
+          cd PlayGodot/python
+          pip install -e .
+          pip install pytest pytest-asyncio
+
+      - name: Import Godot Project
+        run: |
+          echo "=== Importing Godot Project ==="
+          cd example-project
+          # Use Xvfb for headless display
+          xvfb-run --auto-servernum ../godot-automation/godot.linuxbsd.editor.x86_64 \
+            --headless --import . --quit 2>&1 || true
+          echo "Import complete"
+
+      - name: Run PlayGodot Tests
+        run: |
+          echo "=== Running PlayGodot Integration Tests ==="
+          cd example-project
+          export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64"
+          # Run with xvfb for headless display support
+          xvfb-run --auto-servernum pytest tests/test_playgodot_demo.py -v --tb=short 2>&1 || true
+          # For now, don't fail on test errors while we stabilize CI
+          echo "PlayGodot tests completed"
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playgodot-screenshots
+          path: example-project/tests/screenshots/
+          if-no-files-found: ignore
 
   build-and-deploy:
     name: Build & Deploy Web
