@@ -93,10 +93,13 @@ jobs:
           echo "GdUnit4 installed successfully"
 
       # Import Godot project (generates .godot cache)
+      # Run twice: first to cache GdUnit4 addon, second for clean import
       - name: Import Godot Project
         run: |
           echo "=== Importing Godot Project ==="
           cd example-project
+          timeout 60 godot --headless --import . --quit 2>&1 || true
+          echo "=== Re-importing (with GdUnit4 cached) ==="
           timeout 60 godot --headless --import . --quit 2>&1 | tee import.log || true
           echo ""
           echo "Import complete."
