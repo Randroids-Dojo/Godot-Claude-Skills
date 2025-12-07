@@ -293,7 +293,7 @@ jobs:
     name: Build & Deploy Web
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_VERCEL_DEPLOY == 'true'
 
     steps:
       - name: Checkout repository

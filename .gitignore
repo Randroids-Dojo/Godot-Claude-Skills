@@ -1,1 +1,4 @@
 .idea/
+
+# Test screenshots (generated during tests)
+example-project/tests/screenshots/*.png
