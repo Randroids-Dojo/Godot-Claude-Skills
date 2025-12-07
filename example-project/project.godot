@@ -25,3 +25,11 @@ window/size/resizable=false
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+
+[autoload]
+
+PlayGodotServer="*res://addons/playgodot/server.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/playgodot/plugin.cfg")
