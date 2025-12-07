@@ -68,7 +68,11 @@ python skills/godot/scripts/run_tests.py --project ./my-game
 
 ### PlayGodot Python Testing
 
-Test Godot games from Python using pytest with PlayGodot:
+Test Godot games from Python using pytest with PlayGodot. PlayGodot uses Godot's native debugger protocol for reliable automation without requiring any in-game addons.
+
+**Requirements:**
+- Custom Godot fork with automation support: [Randroids-Dojo/godot](https://github.com/Randroids-Dojo/godot) (automation branch)
+- [PlayGodot](https://github.com/Randroids-Dojo/PlayGodot) Python library
 
 ```python
 import pytest
@@ -80,12 +84,20 @@ async def test_game_state():
         await game.wait_for_node("/root/Game")
 
         # Call game methods
-        result = await game.call("/root/Game", "get_score")
+        result = await game.call_method("/root/Game", "get_score")
         assert result == 0
 
+        # Get/set properties
+        health = await game.get_property("/root/Game/Player", "health")
+        await game.set_property("/root/Game/Player", "health", 100)
+
         # Simulate input
-        await game.click("/root/Game/StartButton")
-        await game.press_key("space")
+        await game.click(400, 300)
+        await game.press_key(KEY_SPACE)
+        await game.press_action("jump")
+
+        # Screenshots
+        await game.screenshot("test_screenshot.png")
 ```
 
 ```bash
@@ -147,7 +159,7 @@ godot --headless --path example-project --quit
 cd example-project
 godot --headless -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --run-tests
 
-# Run PlayGodot tests (requires godot-fork with automation support)
+# Run PlayGodot tests (requires Randroids-Dojo/godot automation branch)
 cd example-project
 pytest tests/ -v
 ```

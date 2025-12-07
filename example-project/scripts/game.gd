@@ -23,6 +23,7 @@ var board: Array[CellState] = []
 var current_player: CellState = CellState.X
 var game_active: bool = true
 var moves_count: int = 0
+var winner: CellState = CellState.EMPTY
 
 @onready var grid_container: GridContainer = $VBoxContainer/GameBoard/GridContainer
 @onready var status_label: Label = $VBoxContainer/StatusLabel
@@ -115,10 +116,11 @@ func _check_winner() -> CellState:
 	return CellState.EMPTY
 
 
-func _end_game(winner: CellState) -> void:
+func _end_game(game_winner: CellState) -> void:
 	game_active = false
+	winner = game_winner
 
-	match winner:
+	match game_winner:
 		CellState.X:
 			status_label.text = "Player X Wins!"
 			print("[TicTacToe] Game ended - X wins!")
@@ -145,6 +147,7 @@ func _on_restart_pressed() -> void:
 	current_player = CellState.X
 	game_active = true
 	moves_count = 0
+	winner = CellState.EMPTY
 
 	# Clear all cells
 	for i in range(grid_container.get_child_count()):
@@ -189,3 +192,16 @@ func is_game_active() -> bool:
 ## Get current player symbol
 func get_current_player() -> String:
 	return "X" if current_player == CellState.X else "O"
+
+
+## Get winner ("X", "O", "Draw", or "" if game still active)
+func get_winner() -> String:
+	if game_active:
+		return ""
+	match winner:
+		CellState.X:
+			return "X"
+		CellState.O:
+			return "O"
+		_:
+			return "Draw"
