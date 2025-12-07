@@ -246,6 +246,130 @@ export_path="build/index.html"
 
 See `references/deployment.md` for full Vercel, GitHub Pages, and itch.io setup.
 
+## External Testing with PlayGodot
+
+PlayGodot enables testing Godot games from Python using pytest, supporting both WebSocket addon and native RemoteDebugger protocols.
+
+### Setup
+
+```bash
+# Install PlayGodot
+pip install playgodot
+
+# Or from source
+git clone https://github.com/Randroids-Dojo/PlayGodot.git
+pip install -e PlayGodot/python
+```
+
+### Test Configuration (conftest.py)
+
+```python
+import pytest_asyncio
+from pathlib import Path
+from playgodot import Godot
+
+GODOT_PROJECT = Path(__file__).parent.parent
+GODOT_PATH = "/path/to/godot"  # or use system godot
+
+@pytest_asyncio.fixture
+async def game():
+    async with Godot.launch(
+        str(GODOT_PROJECT),
+        headless=True,
+        timeout=15.0,
+        godot_path=GODOT_PATH,
+        native=True,  # Use native RemoteDebugger protocol
+    ) as g:
+        await g.wait_for_node("/root/Game")
+        yield g
+```
+
+### Writing PlayGodot Tests
+
+```python
+import pytest
+
+GAME = "/root/Game"
+
+@pytest.mark.asyncio
+async def test_game_starts_with_empty_board(game):
+    board = await game.call(GAME, "get_board_state")
+    assert board == ["", "", "", "", "", "", "", "", ""]
+
+@pytest.mark.asyncio
+async def test_clicking_cell_makes_move(game):
+    # Click on center cell (Cell4)
+    await game.click("/root/Game/VBoxContainer/GameBoard/GridContainer/Cell4")
+
+    # Verify move was made
+    board = await game.call(GAME, "get_board_state")
+    assert board[4] == "X"
+
+@pytest.mark.asyncio
+async def test_game_win(game):
+    # Make winning moves
+    await game.call(GAME, "make_move", [0])  # X
+    await game.call(GAME, "make_move", [3])  # O
+    await game.call(GAME, "make_move", [1])  # X
+    await game.call(GAME, "make_move", [4])  # O
+    await game.call(GAME, "make_move", [2])  # X wins!
+
+    is_active = await game.call(GAME, "is_game_active")
+    assert is_active is False
+```
+
+### PlayGodot API
+
+```python
+# Wait for nodes
+await game.wait_for_node("/root/Game", timeout=10.0)
+
+# Call methods
+result = await game.call("/root/Node", "method_name", [arg1, arg2])
+
+# Get/set properties
+value = await game.get("/root/Node", "property_name")
+await game.set("/root/Node", "property_name", new_value)
+
+# Input simulation
+await game.click("/root/Button")           # Click node
+await game.click(300, 200)                 # Click coordinates
+await game.press_key("space")              # Press key
+await game.press_action("jump")            # Press input action
+await game.type_text("hello")              # Type text
+
+# Get node info
+node = await game.get_node("/root/Game")
+tree = await game.get_tree()
+```
+
+### Native vs Addon Protocol
+
+```python
+# Native protocol (requires Godot fork with automation)
+# Uses --remote-debug tcp://127.0.0.1:6007
+async with Godot.launch(project, native=True) as g:
+    pass
+
+# WebSocket addon protocol (requires playgodot addon)
+# Uses WebSocket on port 9999
+async with Godot.launch(project, native=False) as g:
+    pass
+```
+
+### Running PlayGodot Tests
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Run specific test
+pytest tests/test_game.py::test_clicking_cell_makes_move -v
+
+# Use addon protocol instead of native
+PLAYGODOT_ADDON=1 pytest tests/ -v
+```
+
 ## References
 
 - `references/gdunit4-quickstart.md` - Installation and setup
@@ -253,3 +377,4 @@ See `references/deployment.md` for full Vercel, GitHub Pages, and itch.io setup.
 - `references/assertions.md` - All assertion methods
 - `references/ci-integration.md` - CI/CD configuration
 - `references/deployment.md` - Web export and deployment guide
+- `references/playgodot.md` - PlayGodot Python testing guide
