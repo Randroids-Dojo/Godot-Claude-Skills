@@ -173,46 +173,41 @@ pytest tests/ -v
 
 ### Option 1: Plugin Marketplace (Recommended)
 
-Install via Claude Code's plugin system:
+This repository is a Claude Code plugin marketplace. Install via:
 
 ```bash
-# Add the marketplace
 /plugin marketplace add Randroids-Dojo/Godot-Claude-Skills
-
-# Install the plugin
 /plugin install godot
 ```
 
-The skill will be automatically available in all your Claude Code sessions.
+The skill will be available in all your Claude Code sessions.
 
-### Option 2: Personal Installation
+### Option 2: Project-Level
 
-Install for all your projects:
-
-```bash
-# Clone this repo
-git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
-
-# Copy to personal skills directory
-cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
-```
-
-### Option 3: Project-Level Installation
-
-Install for a specific project (shared with team via git):
+Add to your project so all team members get it via git:
 
 ```bash
-# Clone this repo
 git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
-
-# Copy to project skills directory
 mkdir -p your-project/.claude/skills
 cp -r Godot-Claude-Skills/skills/godot your-project/.claude/skills/
+cd your-project
+git add .claude/skills
+git commit -m "Add Godot Claude skill"
+```
+
+### Option 3: Personal Installation
+
+Install for all your projects (just for you):
+
+```bash
+git clone https://github.com/Randroids-Dojo/Godot-Claude-Skills.git
+mkdir -p ~/.claude/skills
+cp -r Godot-Claude-Skills/skills/godot ~/.claude/skills/
 ```
 
 ### Verifying Installation
 
-After installation, Claude will automatically discover the skill when you work on Godot projects. You can verify by asking Claude about GdUnit4 testing or Godot exports.
+Restart Claude Code after installation. The skill will be automatically discovered when you work on Godot projects. You can invoke it directly with `/godot` or ask Claude about GdUnit4 testing, Godot exports, or PlayGodot automation.
 
 ## CI/CD
 
