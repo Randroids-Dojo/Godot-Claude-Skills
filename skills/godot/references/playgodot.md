@@ -5,23 +5,24 @@
 ## Requirements
 
 - **Custom Godot build** - [Randroids-Dojo/godot](https://github.com/Randroids-Dojo/godot) (automation branch)
-- **Python 3.10+** - For running automation scripts
-- **PlayGodot package** - The Python client library
+- **Python 3.9+** - For running automation scripts
+- **PlayGodot package** - `pip install playgodot`
 
 ## Installation
 
 ```bash
 # Install PlayGodot
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install playgodot
 
-# Or install from source
-git clone https://github.com/Randroids-Dojo/PlayGodot.git
-pip install -e PlayGodot/python
-
-# Build or download custom Godot fork
+# Build custom Godot fork
 git clone https://github.com/Randroids-Dojo/godot.git
 cd godot && git checkout automation
-scons platform=macos arch=arm64 target=editor -j8
+scons platform=macos arch=arm64 target=editor -j8  # macOS Apple Silicon
+# scons platform=macos arch=x86_64 target=editor -j8  # macOS Intel
+# scons platform=linuxbsd target=editor -j8  # Linux
+# scons platform=windows target=editor -j8  # Windows
 ```
 
 ## Quick Start
@@ -129,6 +130,14 @@ await game.screenshot("/tmp/screenshot.png")
 
 # Capture specific node
 await game.screenshot(node="/root/Game/UI")
+
+# Compare screenshots (returns similarity 0.0-1.0)
+similarity = await game.compare_screenshot("expected.png")
+assert similarity > 0.99
+
+# Assert screenshot matches reference
+await game.assert_screenshot("reference.png", threshold=0.99)
+await game.assert_screenshot("reference.png", threshold=0.95, save_diff="diff.png")
 ```
 
 ### Scene Management
@@ -166,6 +175,12 @@ node = await game.wait_for_node("/root/Game/SpawnedEnemy", timeout=5.0)
 
 # Wait for visibility
 await game.wait_for_visible("/root/Game/UI/GameOverPanel", timeout=10.0)
+
+# Wait for signal
+await game.wait_for_signal("game_over")
+await game.wait_for_signal("health_changed", source="/root/Game/Player")
+result = await game.wait_for_signal("score_updated", timeout=10.0)
+print(result["args"])  # Signal arguments
 
 # Wait for condition
 async def check_score():

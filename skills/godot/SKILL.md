@@ -191,16 +191,17 @@ PlayGodot is a game automation framework for Godot - like Playwright, but for ga
 
 ```bash
 # Install PlayGodot
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install playgodot
 
-# Or from source
-git clone https://github.com/Randroids-Dojo/PlayGodot.git
-pip install -e PlayGodot/python
-
-# Build or download custom Godot fork
+# Build custom Godot fork
 git clone https://github.com/Randroids-Dojo/godot.git
 cd godot && git checkout automation
-scons platform=macos arch=arm64 target=editor -j8
+scons platform=macos arch=arm64 target=editor -j8  # macOS Apple Silicon
+# scons platform=macos arch=x86_64 target=editor -j8  # macOS Intel
+# scons platform=linuxbsd target=editor -j8  # Linux
+# scons platform=windows target=editor -j8  # Windows
 ```
 
 ### Test Configuration (conftest.py)
@@ -300,6 +301,8 @@ await game.pinch((200, 200), 0.5)
 # Screenshots
 png_bytes = await game.screenshot()
 await game.screenshot("/tmp/screenshot.png")
+similarity = await game.compare_screenshot("expected.png")
+await game.assert_screenshot("reference.png", threshold=0.99)
 
 # Scene management
 scene = await game.get_current_scene()
@@ -312,6 +315,12 @@ await game.unpause()
 is_paused = await game.is_paused()
 await game.set_time_scale(0.5)
 scale = await game.get_time_scale()
+
+# Waiting
+await game.wait_for_node("/root/Game/SpawnedEnemy", timeout=5.0)
+await game.wait_for_visible("/root/Game/UI/GameOverPanel", timeout=10.0)
+await game.wait_for_signal("game_over")
+await game.wait_for_signal("health_changed", source="/root/Game/Player")
 ```
 
 ---
