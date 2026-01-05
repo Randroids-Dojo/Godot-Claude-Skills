@@ -72,7 +72,12 @@ python skills/godot/scripts/run_tests.py --project ./my-game
 
 **Requirements:**
 - Custom Godot fork with automation support: [Randroids-Dojo/godot](https://github.com/Randroids-Dojo/godot) (automation branch)
-- [PlayGodot](https://github.com/Randroids-Dojo/PlayGodot) Python library
+- PlayGodot Python library:
+  ```bash
+  python -m venv .venv
+  source .venv/bin/activate  # Windows: .venv\Scripts\activate
+  pip install playgodot
+  ```
 
 ```python
 import pytest
