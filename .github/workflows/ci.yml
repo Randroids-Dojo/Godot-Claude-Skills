@@ -280,7 +280,7 @@ jobs:
           cd example-project
           export GODOT_PATH="${{ github.workspace }}/godot-automation/godot.linuxbsd.editor.x86_64.mono"
           # Run with xvfb for headless display support
-          xvfb-run --auto-servernum pytest tests/test_playgodot_demo.py -v --tb=short
+          xvfb-run --auto-servernum pytest tests/test_playgodot.py -v --tb=short
           echo "PlayGodot tests completed"
 
       - name: Upload Screenshots

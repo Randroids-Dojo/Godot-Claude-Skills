@@ -46,6 +46,7 @@ Create a `conftest.py` file for pytest:
 
 ```python
 import os
+import socket
 import pytest_asyncio
 from pathlib import Path
 from playgodot import Godot
@@ -53,13 +54,42 @@ from playgodot import Godot
 GODOT_PROJECT = Path(__file__).parent.parent
 GODOT_PATH = os.environ.get("GODOT_PATH", "/path/to/godot-fork")
 
+
+def get_free_port() -> int:
+    """Find an available port by binding to port 0."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('127.0.0.1', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+
+
+def get_playgodot_port() -> int:
+    """Determine port for PlayGodot - supports parallel test execution."""
+    # Priority 1: Explicit environment variable
+    env_port = os.environ.get("PLAYGODOT_PORT")
+    if env_port:
+        return int(env_port)
+
+    # Priority 2: pytest-xdist worker ID
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker_id and worker_id != "master":
+        worker_num = int(worker_id.replace("gw", ""))
+        return 6007 + worker_num + 1
+
+    # Priority 3: Dynamic port allocation
+    return get_free_port()
+
+
 @pytest_asyncio.fixture
 async def game():
+    port = get_playgodot_port()
+
     async with Godot.launch(
         str(GODOT_PROJECT),
         headless=True,
         timeout=15.0,
         godot_path=GODOT_PATH,
+        port=port,
     ) as g:
         await g.wait_for_node("/root/Game")
         yield g
@@ -235,6 +265,39 @@ pytest tests/test_game.py::test_clicking_cell -v
 # Stop on first failure
 pytest tests/ -v -x
 ```
+
+## Parallel Test Execution
+
+PlayGodot supports running multiple test sessions in parallel via dynamic port allocation.
+
+### How It Works
+
+Each test session automatically gets a unique port:
+
+1. **PLAYGODOT_PORT env var** - Explicit override (highest priority)
+2. **pytest-xdist worker ID** - For parallel workers within a session
+3. **Dynamic free port** - Auto-allocated for cross-session safety
+
+### Running Tests in Parallel
+
+```bash
+# Sequential (auto port)
+pytest tests/ -v
+
+# Parallel within session (requires: pip install pytest-xdist)
+pytest tests/ -n 4
+
+# Multiple sessions (each gets unique port automatically)
+# Terminal 1: pytest tests/test_fire.py -v
+# Terminal 2: pytest tests/test_autofire.py -v
+
+# Explicit port override
+PLAYGODOT_PORT=7000 pytest tests/ -v
+```
+
+### Why This Matters
+
+Without dynamic port allocation, multiple test sessions would conflict on port 6007, causing `OSError: [Errno 48] address already in use`. The `get_playgodot_port()` function in the conftest.py example handles this automatically.
 
 ## Debugging
 
