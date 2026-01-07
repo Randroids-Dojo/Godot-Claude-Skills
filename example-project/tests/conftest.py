@@ -1,6 +1,7 @@
 """Pytest configuration for PlayGodot E2E tests."""
 
 import os
+import socket
 import sys
 from pathlib import Path
 
@@ -30,6 +31,39 @@ except ImportError:
 
 GODOT_PROJECT = Path(__file__).parent.parent
 
+
+def get_free_port() -> int:
+    """Find an available port by binding to port 0."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('127.0.0.1', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+
+
+def get_playgodot_port() -> int:
+    """
+    Determine port for PlayGodot connection.
+
+    Supports parallel test execution via dynamic port allocation:
+    1. PLAYGODOT_PORT env var - Explicit override (highest priority)
+    2. pytest-xdist worker ID - For parallel workers within a session
+    3. Dynamic free port - Auto-allocated for cross-session safety
+    """
+    # Priority 1: Explicit environment variable
+    env_port = os.environ.get("PLAYGODOT_PORT")
+    if env_port:
+        return int(env_port)
+
+    # Priority 2: pytest-xdist worker ID
+    worker_id = os.environ.get("PYTEST_XDIST_WORKER")
+    if worker_id and worker_id != "master":
+        worker_num = int(worker_id.replace("gw", ""))
+        return 6007 + worker_num + 1
+
+    # Priority 3: Dynamic port allocation
+    return get_free_port()
+
+
 # Require GODOT_PATH environment variable
 GODOT_PATH = os.environ.get("GODOT_PATH")
 if not GODOT_PATH:
@@ -53,13 +87,18 @@ async def game():
 
     Uses Godot's native RemoteDebugger protocol for automation.
     Requires the custom Godot fork with automation support.
+
+    Supports parallel test execution - each session gets a unique port.
     """
+    port = get_playgodot_port()
+
     async with Godot.launch(
         str(GODOT_PROJECT),
         headless=True,
         timeout=15.0,
         verbose=True,
         godot_path=GODOT_PATH,
+        port=port,
     ) as g:
         await g.wait_for_node("/root/Game")
         yield g
