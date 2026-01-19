@@ -1,3 +1,9 @@
+# DEPRECATED - Skill now lives in the [Randroid's Dojo](https://github.com/Randroids-Dojo/skills/tree/main/plugins/godot) marketplace
+
+---
+---
+
+---
 # Godot-Claude-Skills
 
 A Claude Code skill for Godot Engine game development.
